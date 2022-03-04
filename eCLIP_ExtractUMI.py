@@ -55,11 +55,12 @@ for i in range(100):
 ######
 print("Creating classes to store FastqReads")
 class FastQReadF():
-    def __init__(self, name, read, quality, lineNumber):
+    def __init__(self, name, read, quality, lineNumber, umi):
         self.name = name
         self.read = read
         self.quality = quality
         self.lineNumber = lineNumber
+        self.umi = umi
 
     def display_read(self):
         print("name = " + str(self.name) + "\n" \
@@ -72,6 +73,9 @@ class FastQReadF():
             + str(self.read) + "\n" \
             + "+" + "\n" \
             + str(self.quality) + "\n")
+
+    def return_umi(self):
+        return(str(self.umi)
 
 class FastQReadR():
     def __init__(self, name, read, quality, lineNumber):
@@ -161,10 +165,11 @@ for i in range(0,int(linesInInputFastq),int(binIterator)):
                 completeReadCounter += 3
             if (completeReadCounter == 6):
                 #print("Read completed appending to dict")
-                processedRead = FastQReadF(name = str("@" + lineReadF[0:8] + "_" + lineNameSplit[0]), \
+                processedRead = FastQReadF(name = str("@" + lineReadF[0:8] + ":" + lineNameSplit[0] + " " + lineNameSplit[1]), \
                     read = str(lineReadF[8:len(lineReadF)]), \
                     quality = str(lineQuality[8:len(lineQuality)]), \
-                    lineNumber = line_ct1)
+                    lineNumber = line_ct1, \
+                    umi = lineReadF[0:8])
                 readsF[readIDF]=processedRead
                 del(readIDF)
                 completeReadCounter = 0
@@ -206,7 +211,8 @@ for i in range(0,int(linesInInputFastq),int(binIterator)):
                 completeReadCounter += 3
             if (completeReadCounter == 6):
                 #print("Read completed appending to dict")
-                processedRead = FastQReadR(name = str("@" + lineReadF[0:8] + "_" + lineNameSplit[0]), \
+                readF_umi = str(readsF[readIDR].return_umi())
+                processedRead = FastQReadR(name = str("@" + readF_umi + ":" + lineNameSplit[0] + " " + lineNameSplit[1]), \
                     read = str(lineReadR), \
                     quality = str(lineQuality), \
                     lineNumber = line_ct1)
